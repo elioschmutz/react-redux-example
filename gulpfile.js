@@ -27,7 +27,9 @@ gulp.task('clean', function() {
 gulp.task('scripts', function() {
     return gulp.src(paths.scripts)
         .pipe(sourcemaps.init())
-        .pipe(babel())
+        .pipe(babel({
+            plugins: ['transform-react-jsx']
+        }))
         .pipe(concat('all.min.js'))
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(paths.dest + 'js'));
@@ -36,7 +38,9 @@ gulp.task('scripts', function() {
 // Minify and transpile copy all JavaScript
 gulp.task('scripts-dist', function() {
     return gulp.src(paths.scripts)
-        .pipe(babel())
+        .pipe(babel({
+            plugins: ['transform-react-jsx']
+        }))
         .pipe(uglify())
         .pipe(concat('all.min.js'))
         .pipe(gulp.dest(paths.dest + 'js'));
