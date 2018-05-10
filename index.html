@@ -39,16 +39,26 @@
                )
             }
 
+            class ConnectedTodos extends React.Component {
+                render() {
+                    return (
+                        <Context.Consumer>
+                            {store => <Todos todos={store.getState().todos} dispatch={store.dispatch} />}
+                        </Context.Consumer>
+                    )
+                }
+            }
+
             class Todos extends React.Component {
                 removeItem = (todo) => {
-                    this.props.store.dispatch(handleRemoveTodo(todo))
+                    this.props.dispatch(handleRemoveTodo(todo))
                 }
                 toggleItem = (id) => {
-                    this.props.store.dispatch(handleToggleTodoAction(id))
+                    this.props.dispatch(handleToggleTodoAction(id))
                 }
                 addItem = (e) => {
                     e.preventDefault()
-                    this.props.store.dispatch(handleAddTodo(this.input.value))
+                    this.props.dispatch(handleAddTodo(this.input.value))
                     .then(() => {
                         this.input.value = ''
                     });
@@ -67,13 +77,23 @@
                 }
             }
 
+            class ConnectedGoals extends React.Component {
+                render() {
+                    return (
+                        <Context.Consumer>
+                            {store => <Goals goals={store.getState().goals}  dispatch={store.dispatch} />}
+                        </Context.Consumer>
+                    )
+                }
+            }
+
             class Goals extends React.Component {
                 removeItem = (goal) => {
-                    this.props.store.dispatch(handleRemoveGoal(goal))
+                    this.props.dispatch(handleRemoveGoal(goal))
                 }
                 addItem = (e) => {
                     e.preventDefault()
-                    this.props.store.dispatch(handleAddGoal(this.input.value))
+                    this.props.dispatch(handleAddGoal(this.input.value))
                     .then(() => {
                         this.input.value = ''
                     });
@@ -89,6 +109,27 @@
                             <List remove={this.removeItem} items={this.props.goals}/>
                         </div>
                         )
+                }
+            }
+
+            const Context = React.createContext()
+
+            class Provider extends React.Component {
+                render() {
+                    return (
+                        <Context.Provider value={this.props.store}>
+                            {this.props.children}
+                        </Context.Provider>)
+                }
+            }
+
+            class ConnectedApp extends React.Component {
+                render() {
+                    return (
+                    <Context.Consumer>
+                        {store => <App store={store} />}
+                    </Context.Consumer>
+                    )
                 }
             }
 
@@ -108,14 +149,16 @@
                     return (
                         <div>
                             <h1>Todo list</h1>
-                            <Todos todos={todos} store={store}/>
-                            <Goals goals={goals} store={store}/>
+                            <ConnectedTodos />
+                            <ConnectedGoals />
                         </div>
                     )
                 }
             }
             ReactDOM.render(
-              <App store={store} />,
+              <Provider store={store}>
+                  <ConnectedApp />
+              </Provider>,
               document.getElementById('app')
             );
 
