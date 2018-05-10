@@ -41,20 +41,27 @@
             class Todos extends React.Component {
                 removeItem = (todo) => {
                     this.props.store.dispatch(removeTodoAction(todo.id))
+                    API.deleteTodo(todo).catch(() => {
+                        this.props.store.dispatch(addTodoAction(todo))
+                    })
                 }
                 toggleItem = (id) => {
                     this.props.store.dispatch(toggleTodoAction(id))
+                    API.saveTodoToggle(id).catch(() => {
+                        this.props.store.dispatch(toggleTodoAction(id))
+                    })
                 }
                 addItem = (e) => {
                     e.preventDefault()
                     const name = this.input.value
-                    this.input.value = ''
 
-                    this.props.store.dispatch(addTodoAction({
-                        id: ID(),
-                        complete: false,
-                        name: name
-                    }));
+                    API.saveTodo(this.input.value).then((todo) => {
+                        this.input.value = ''
+                        this.props.store.dispatch(addTodoAction(todo));
+                    }).catch(() => {
+                        alert("Something went wrong.")
+                    })
+
                 }
                 render() {
                     return (
@@ -73,17 +80,19 @@
             class Goals extends React.Component {
                 removeItem = (goal) => {
                     this.props.store.dispatch(removeGoalAction(goal.id))
+                    API.deleteGoal(goal).catch(() => {
+                        this.props.store.dispatch(addGoalAction(goal))
+                    })
                 }
                 addItem = (e) => {
                     e.preventDefault()
-                    const name = this.input.value
-                    this.input.value = ''
 
-                    this.props.store.dispatch(addGoalAction({
-                        id: ID(),
-                        complete: false,
-                        name: name
-                    }));
+                    API.saveTodo(this.input.value).then((goal) => {
+                        this.input.value = ''
+                        this.props.store.dispatch(addGoalAction(goal));
+                    }).catch(() => {
+                        alert("Something went wrong.")
+                    })
                 }
                 render() {
                     return (
