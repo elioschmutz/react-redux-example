@@ -14,6 +14,8 @@
         <script src="https://unpkg.com/react@16.3.0-alpha.1/umd/react.development.js"></script>
         <script src="https://unpkg.com/react-dom@16.3.0-alpha.1/umd/react-dom.development.js"></script>
         <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+
+        <script src="https://tylermcginnis.com/goals-todos-api/index.js"></script>
     </head>
     <body>
         <div id="app"></div>
@@ -27,7 +29,7 @@
                             <li key={item.id}>
                                 <span  onClick={() => props.toggle && props.toggle(item.id)}
                                        className={item.complete ? 'complete' : ''}>
-                                    {item.title}
+                                    {item.name}
                                 </span>
                                 <button onClick={() => props.remove(item)}>x</button>
                             </li>
@@ -51,7 +53,7 @@
                     this.props.store.dispatch(addTodoAction({
                         id: ID(),
                         complete: false,
-                        title: name
+                        name: name
                     }));
                 }
                 render() {
@@ -80,7 +82,7 @@
                     this.props.store.dispatch(addGoalAction({
                         id: ID(),
                         complete: false,
-                        title: name
+                        name: name
                     }));
                 }
                 render() {
@@ -100,11 +102,22 @@
             class App extends React.Component {
                 componentDidMount = () => {
                     const store = this.props.store
+                    Promise.all([
+                        API.fetchTodos(),
+                        API.fetchGoals()
+                    ]).then(([todos, goals]) => {
+                        store.dispatch(receiveDataAction(todos, goals))
+                    })
+
                     store.subscribe(() => this.forceUpdate())
                 }
                 render() {
                     const store = this.props.store
-                    const { todos, goals } = store.getState()
+                    const { todos, goals, loading } = store.getState()
+
+                    if (loading === true) {
+                        return <h1>Loading</h1>
+                    }
                     return (
                         <div>
                             <h1>Todo list</h1>
